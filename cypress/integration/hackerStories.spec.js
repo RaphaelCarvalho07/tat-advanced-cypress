@@ -67,15 +67,6 @@ describe('Hacker Stories', () => {
 
       it('orders by points', () => { })
     })
-
-    // Hrm, how would I simulate such errors?
-    // Since I still don't know, the tests are being skipped.
-    // TODO: Find a way to test them out.
-    context.skip('Errors', () => {
-      it('shows "Something went wrong ..." in case of a server error', () => { })
-
-      it('shows "Something went wrong ..." in case of a network error', () => { })
-    })
   })
 
   context('Search', () => {
@@ -168,3 +159,32 @@ describe('Hacker Stories', () => {
     })
   })
 })
+
+// Hrm, how would I simulate such errors?
+    // Since I still don't know, the tests are being skipped.
+    // TODO: Find a way to test them out.
+    context('Errors', () => {
+      it('shows "Something went wrong ..." in case of a server error', () => {
+        cy.intercept({
+          method: 'GET',
+          pathname:'**/search**',
+        }, {statusCode:500}).as('getServerFailure')
+        cy.visit('/')
+        cy.wait('@getServerFailure')
+
+        cy.get('p:contains(Something went wrong ...)')
+          .should('be.visible')
+      })
+
+      it('shows "Something went wrong ..." in case of a network error', () => {
+        cy.intercept({
+          method: 'GET',
+          pathname:'**/search**'
+        }, {forceNetworkError: true}).as('getNetworkFailue')
+        cy.visit('/')
+        cy.wait('@getNetworkFailue')
+
+        cy.get('p:contains(Something went wrong ...)')
+          .should('be.visible')
+      })
+    })
