@@ -275,7 +275,7 @@ describe('Hacker Stories', () => {
       })
 
       context('Last searches', () => {
-        it('shows a max of 5 buttons for the last searched terms', () => {
+        it.only('shows a max of 5 buttons for the last searched terms', () => {
           const faker = require('faker')
 
           cy.intercept({
@@ -291,8 +291,11 @@ describe('Hacker Stories', () => {
             cy.wait('@getRandomStories')
           })
 
-          cy.get('.last-searches button')
-            .should('have.length', 5)
+          cy.get('.last-searches')
+            .within(() => {
+              cy.get('button')
+                .should('have.length', 5)
+            })
         })
       })
     })
