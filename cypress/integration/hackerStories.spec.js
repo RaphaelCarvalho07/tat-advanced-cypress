@@ -318,9 +318,6 @@ describe('Hacker Stories', () => {
   })
 })
 
-// Hrm, how would I simulate such errors?
-// Since I still don't know, the tests are being skipped.
-// TODO: Find a way to test them out.
 context('Errors', () => {
   it('shows "Something went wrong ..." in case of a server error', () => {
     cy.intercept({
@@ -344,5 +341,23 @@ context('Errors', () => {
 
     cy.get('p:contains(Something went wrong ...)')
       .should('be.visible')
+  })
+})
+context('Intermediate app state', () => {
+  it('shows a "Loading ..." state before showing the results', () => {
+    cy.intercept({
+      method: 'GET',
+      pathname: '**/search**'
+    }, {
+      delay: 1000,
+      fixture: 'stories'
+    }).as('getDelayedStories')
+
+    cy.visit('/')    
+    cy.assertLoadingIsShownAndHidden()
+
+    cy.wait('@getDelayedStories')    
+
+    cy.get('.item').should('have.length', 2)
   })
 })
